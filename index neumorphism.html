@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Stamp Foto – Waktu & Lokasi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto+Condensed:wght@500&family=Inter:wght@400;500;600&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.global.prod.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{color-scheme:light;--bg:#e6eaf2;--sl:#ffffff;--sd:#b9c1d6;--tx:#3a4261;--mut:#7a85a5;--ac:#6676ff;--ac2:#4b5bea}
+*{box-sizing:border-box}
+[v-cloak]{display:none}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--tx);font:500 15px/1.45 "Nunito","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+main{max-width:1000px;margin:0 auto;padding:26px 16px 34px;display:grid;gap:30px}
+@media(min-width:820px){main{grid-template-columns:1fr 350px;align-items:start}}
+.card,.sheet{background:var(--bg);border-radius:28px;padding:20px;box-shadow:10px 10px 22px var(--sd),-10px -10px 22px var(--sl)}
+h1{display:block;font-size:19px;font-weight:800;margin:0 0 4px;letter-spacing:-.01em}
+.sub{font-size:13px;margin:0 0 10px;color:var(--mut);font-weight:500}
+label{display:block;font-size:12px;font-weight:700;color:var(--mut);margin:14px 0 7px;letter-spacing:.02em}
+input,textarea{width:100%;padding:12px 14px;border:0;border-radius:16px;background:var(--bg);color:var(--tx);font:inherit;box-shadow:inset 5px 5px 10px var(--sd),inset -5px -5px 10px var(--sl);transition:box-shadow .15s}
+::placeholder{color:var(--mut);opacity:.75}
+input:focus,textarea:focus{outline:none;box-shadow:inset 5px 5px 10px var(--sd),inset -5px -5px 10px var(--sl),0 0 0 3px rgba(102,118,255,.4)}
+input[type=range]{padding:0;height:26px;box-shadow:none;background:none;accent-color:var(--ac)}
+input[type=range]:focus{box-shadow:none}
+textarea{resize:vertical;min-height:64px}
+.row{display:flex;gap:12px}.row>*{flex:1;min-width:0}
+button,.btn{appearance:none;border:0;border-radius:16px;background:var(--bg);color:var(--tx);padding:11px 16px;font:inherit;font-weight:700;cursor:pointer;text-align:center;box-shadow:6px 6px 12px var(--sd),-6px -6px 12px var(--sl);transition:box-shadow .12s,transform .12s,color .12s}
+button:hover,.btn:hover{color:var(--ac2)}
+button:active,.btn:active{box-shadow:inset 4px 4px 8px var(--sd),inset -4px -4px 8px var(--sl);transform:scale(.99)}
+button:focus-visible,.btn:focus-visible{outline:none;box-shadow:6px 6px 12px var(--sd),-6px -6px 12px var(--sl),0 0 0 3px rgba(102,118,255,.45)}
+button:disabled{opacity:.55;pointer-events:none}
+.pri,.pk{background:linear-gradient(145deg,#7482ff,#5967ee);color:#fff;text-shadow:0 1px 1px rgba(30,40,140,.3)}
+.pri:hover,.pk:hover{color:#fff;filter:brightness(1.06)}
+.pri:active,.pk:active{box-shadow:inset 4px 4px 8px rgba(30,40,140,.45),inset -3px -3px 6px rgba(140,155,255,.5)}
+.btns{display:flex;gap:12px;flex-wrap:wrap}.btns>*{flex:1;white-space:nowrap}
+.stage{background:var(--bg);border-radius:22px;box-shadow:inset 7px 7px 14px var(--sd),inset -7px -7px 14px var(--sl);padding:10px;overflow:hidden;min-height:200px;display:flex;align-items:center;justify-content:center;margin-top:18px}
+canvas,video{max-width:100%;max-height:72vh;display:block;border-radius:14px}
+.empty{color:var(--mut);text-align:center;padding:40px 20px;font-weight:600}
+.msg{font-size:13px;color:var(--mut);margin-top:14px;min-height:18px;font-weight:600}
+input[type=file]{display:none}
+.modal{position:fixed;inset:0;background:rgba(230,234,242,.72);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);z-index:2000;display:flex;align-items:center;justify-content:center;padding:max(10px,env(safe-area-inset-top)) 12px max(10px,env(safe-area-inset-bottom))}
+.sheet{width:100%;max-width:720px;max-height:100%;overflow:auto;box-shadow:14px 14px 30px var(--sd),-12px -12px 26px var(--sl)}
+.mapbox{height:340px;margin:18px 6px 8px;border-radius:20px;overflow:hidden;position:relative;z-index:0;box-shadow:7px 7px 14px var(--sd),-7px -7px 14px var(--sl)}
+.results{border-radius:16px;margin-top:12px;max-height:150px;overflow:auto;background:var(--bg);box-shadow:inset 5px 5px 10px var(--sd),inset -5px -5px 10px var(--sl)}
+.res{padding:9px 14px;border-bottom:1px solid rgba(150,160,190,.25);cursor:pointer;font-size:13px}
+.res:last-child{border-bottom:0}
+.res:hover{background:rgba(102,118,255,.12);color:var(--ac2)}
+.pin{font-size:30px;line-height:1;filter:drop-shadow(0 3px 3px rgba(0,0,0,.3));background:none;border:0}
+.leaflet-bar{border:0!important;border-radius:12px!important;box-shadow:0 2px 8px rgba(60,70,110,.35)!important;overflow:hidden}
+.leaflet-bar a{background:#eef1f8!important;color:var(--tx)!important}
+.leaflet-control-layers{border:0!important;border-radius:12px!important;box-shadow:0 2px 8px rgba(60,70,110,.35)!important;background:#eef1f8!important;font-family:inherit;font-weight:600;color:var(--tx)}
+.leaflet-control-attribution{background:rgba(238,241,248,.9)!important}
+@media(max-width:600px){.card,.sheet{box-shadow:7px 7px 15px var(--sd),-7px -7px 15px var(--sl)}}
+</style>
+</head>
+<body>
+<div id="app" v-cloak>
+<main>
+<section class="card">
+  <h1>📍 Stamp Foto</h1>
+  <p class="sub">Ambil foto atau pilih dari galeri, isi waktu & lokasi, lalu simpan.</p>
+  <div class="btns">
+    <button class="blu" @click="startCam">📷 Kamera</button>
+    <label class="btn" style="margin:0;color:var(--tx)">🖼️ Galeri<input type="file" accept="image/*" @change="onFile"></label>
+  </div>
+
+  <div v-show="camOn" style="margin-top:10px">
+    <div class="stage" style="margin-top:0"><video ref="vid" playsinline muted></video></div>
+    <div class="row" style="margin-top:8px">
+      <button class="pri" @click="shot">Jepret</button>
+      <button @click="flip">Balik</button>
+      <button @click="stopCam">Tutup</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="empty" v-if="!hasImg">Belum ada foto.<br>Pilih dari galeri atau buka kamera.</div>
+    <canvas ref="cv" v-show="hasImg"></canvas>
+  </div>
+  <div class="btns" style="margin-top:10px">
+    <button class="pk" @click="save">⬇️ Simpan foto</button>
+    <button @click="share">Bagikan</button>
+  </div>
+  <div class="msg">{{ msg }}</div>
+</section>
+
+<section class="card">
+  <h1>Data Stamp</h1>
+  <label>Tanggal & jam</label>
+  <div class="row">
+    <input type="datetime-local" v-model="dt">
+    <button style="flex:0 0 auto" @click="dt = toLocal(new Date())">Sekarang</button>
+  </div>
+  <label>Alamat / nama lokasi</label>
+  <textarea v-model="loc" placeholder="Fakultas Teknik ULM Banjarbaru, Jl. Jenderal Achmad Yani KM.35,5, ..."></textarea>
+  <div class="row">
+    <div><label>Latitude</label><input v-model="lat" inputmode="decimal" placeholder="-3.445238"></div>
+    <div><label>Longitude</label><input v-model="lng" inputmode="decimal" placeholder="114.840733"></div>
+  </div>
+  <p class="sub" style="margin:4px 0 0">Minus = Selatan / Barat. Kosongkan untuk menyembunyikan kotak koordinat.</p>
+  <div class="btns" style="margin-top:8px">
+    <button class="grn" @click="openMap">🗺️ Pilih di peta</button>
+    <button @click="gps">📡 GPS saya</button>
+  </div>
+  <label>Catatan (opsional, tampil di bawah alamat)</label>
+  <input v-model="note" placeholder="mis. Pembukaan pelatihan">
+  <label>Ukuran stamp {{ sz }}%</label>
+  <input type="range" min="70" max="140" v-model.number="sz" style="padding:0">
+  <p class="sub" style="margin-top:12px">Alamat tidak terisi otomatis dari GPS; ketik manual.</p>
+</section>
+</main>
+
+<div class="modal" v-show="mapOpen" @click.self="mapOpen=false">
+  <div class="sheet">
+    <div class="row" style="align-items:center">
+      <h1 style="flex:1">🗺️ Pilih Lokasi di Peta</h1>
+      <button style="flex:0 0 auto" @click="mapOpen=false">✕</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <input v-model="q" placeholder="Cari alamat / tempat, atau ketik: -3.445238, 114.840733" @keyup.enter="searchPlace">
+      <button class="pri" style="flex:0 0 auto" :disabled="busy" @click="searchPlace">Cari</button>
+      <button style="flex:0 0 auto" title="Lokasi saya" @click="myLoc">📡</button>
+    </div>
+    <div class="results" v-if="results.length">
+      <div class="res" v-for="r in results" :key="r.place_id" @click="pickResult(r)">{{ cleanAddr(r.display_name) }}</div>
+    </div>
+    <div class="mapbox" ref="mapEl"></div>
+    <p class="sub" style="margin:8px 0 0">
+      {{ picked.lat==null ? 'Klik peta untuk menaruh titik, atau geser pin.' : 'Lat ' + picked.lat.toFixed(6) + ', Long ' + picked.lng.toFixed(6) }}
+      <span v-if="mapMsg"> · {{ mapMsg }}</span>
+    </p>
+    <label>Alamat / nama lokasi (bisa diedit)</label>
+    <textarea v-model="picked.addr" style="min-height:54px"></textarea>
+    <div class="row" style="margin-top:8px">
+      <button @click="reverseAddr">Isi alamat dari titik</button>
+      <button class="pri" @click="applyPick">Gunakan lokasi ini</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+const { createApp, ref, reactive, watch, onMounted, onBeforeUnmount } = Vue;
+
+const HARI=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const BLN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const CARTO_KEY='cb1_45ro_1_f1c744d8b188cb5ca3ec9552'; // API key CARTO basemaps
+const F='"Roboto","Helvetica Neue",Arial,sans-serif';
+const FC='"Roboto Condensed","Arial Narrow",Arial,sans-serif';
+const p2=n=>String(n).padStart(2,'0');
+const toLocal=d=>`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}T${p2(d.getHours())}:${p2(d.getMinutes())}`;
+const store={
+  get(k){try{return localStorage.getItem(k)}catch(e){return null}},
+  set(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+};
+const fontsReady=async()=>{try{await Promise.all([document.fonts.load('500 100px "Roboto Condensed"'),document.fonts.load('400 100px Roboto')])}catch(e){}};
+function fmtC(v,pos,neg){
+  const n=parseFloat(String(v).replace(',','.'));
+  return isNaN(n)?v:Math.abs(n).toFixed(6)+'°'+(n<0?neg:pos);
+}
+
+createApp({
+  setup(){
+    const cv=ref(null),vid=ref(null);
+    const dt=ref(toLocal(new Date()));
+    const loc=ref(store.get('st_loc')||''),lat=ref(store.get('st_lat')||''),lng=ref(store.get('st_lng')||''),note=ref(store.get('st_note')||'');
+    const sz=ref(100),msg=ref(''),hasImg=ref(false),camOn=ref(false);
+    let img=null,stream=null,facing='environment';
+
+    function wrap(ctx,text,maxW){
+      const out=[];
+      text.split('\n').forEach(par=>{
+        let line='';
+        par.split(/\s+/).filter(Boolean).forEach(w=>{
+          const t=line?line+' '+w:w;
+          if(ctx.measureText(t).width>maxW&&line){out.push(line);line=w}else line=t;
+        });
+        if(line)out.push(line);
+      });
+      return out;
+    }
+
+    function render(){
+      if(!img||!cv.value)return;
+      const c=cv.value,ctx=c.getContext('2d');
+      const W=img.width,H=img.height;
+      c.width=W;c.height=H;
+      ctx.drawImage(img,0,0);
+      const rr=(x,y,w,h,r)=>{ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h);ctx.fill()};
+      const k=W/2212*(sz.value/100); // 1 unit = 1px pada foto contoh lebar 2212px
+      const d=new Date(dt.value||Date.now());
+      const time=p2(d.getHours())+':'+p2(d.getMinutes());
+      const dateStr=`${d.getDate()} ${BLN[d.getMonth()]} ${d.getFullYear()}`;
+      const dayStr=HARI[d.getDay()];
+
+      ctx.font=`400 ${50*k}px ${F}`;
+      const maxW=W>=H?1080*k:Math.min(1500*k,W-90*k);
+      const lines=[];
+      if(loc.value.trim())lines.push(...wrap(ctx,loc.value.trim(),maxW));
+      if(note.value.trim())lines.push(...wrap(ctx,note.value.trim(),maxW));
+
+      const la=lat.value.trim(),lo=lng.value.trim(),hasC=la&&lo;
+      const panelH=145*k,panelTop=H-49*k-panelH;
+      if(hasC){
+        const ct=`Koordinat: ${fmtC(la,'N','S')}, ${fmtC(lo,'E','W')}`;
+        const tw=ctx.measureText(ct).width;
+        ctx.fillStyle='rgba(255,255,255,.22)';
+        rr(50*k,panelTop,tw+56*k,panelH,16*k);
+        ctx.fillStyle='#fff';ctx.textBaseline='middle';
+        ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=6*k;ctx.shadowOffsetY=2*k;
+        ctx.fillText(ct,78*k,panelTop+panelH/2+2*k);
+        ctx.shadowColor='transparent';
+      }
+      const anchorTop=hasC?panelTop:H-30*k;
+      const lh=70*k,n=lines.length;
+      const lastC=anchorTop-55*k,firstC=lastC-(n-1)*lh;
+      const blockBottom=n?firstC-75*k:anchorTop-60*k;
+      const blockTop=blockBottom-160*k;
+
+      ctx.fillStyle='#fff';ctx.textBaseline='middle';
+      ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=8*k;ctx.shadowOffsetY=2*k;
+      ctx.font=`400 ${50*k}px ${F}`;
+      lines.forEach((t,i)=>ctx.fillText(t,45*k,firstC+i*lh));
+      ctx.fillText(dateStr,455*k,blockTop+25*k);
+      ctx.fillText(dayStr,455*k,blockBottom-25*k);
+
+      ctx.save();
+      ctx.font=`500 ${211*k}px ${FC}`;ctx.textBaseline='alphabetic';
+      const w0=ctx.measureText('08:15').width;
+      const sx=Math.max(.5,Math.min(1.15,(320*k)/w0));
+      ctx.translate(50*k,blockBottom-5*k);ctx.scale(sx,1);
+      ctx.fillText(time,0,0);
+      ctx.restore();
+
+      ctx.shadowColor='transparent';
+      ctx.fillStyle='#f2a900';
+      ctx.fillRect(415*k,blockTop,6*k,160*k);
+    }
+
+    async function setImg(src){
+      await fontsReady();
+      img=src;hasImg.value=true;
+      await Vue.nextTick();render();
+    }
+
+    watch([dt,loc,lat,lng,note,sz],render);
+    watch(loc,v=>store.set('st_loc',v));
+    watch(lat,v=>store.set('st_lat',v));
+    watch(lng,v=>store.set('st_lng',v));
+    watch(note,v=>store.set('st_note',v));
+
+    async function onFile(e){
+      const f=e.target.files[0];if(!f)return;
+      try{
+        let bmp;
+        try{bmp=await createImageBitmap(f,{imageOrientation:'from-image'})}catch(_){bmp=await createImageBitmap(f)}
+        const s=Math.min(1,4096/Math.max(bmp.width,bmp.height));
+        if(s<1){const c=document.createElement('canvas');c.width=Math.round(bmp.width*s);c.height=Math.round(bmp.height*s);c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);bmp=c}
+        if(f.lastModified)dt.value=toLocal(new Date(f.lastModified));
+        await setImg(bmp);msg.value='Foto dimuat. Jam diisi dari tanggal file; ubah bila perlu.';
+      }catch(err){msg.value='Gagal membuka foto.'}
+      e.target.value='';
+    }
+
+    function gps(){
+      if(!navigator.geolocation){msg.value='GPS tidak didukung.';return}
+      msg.value='Mengambil lokasi…';
+      navigator.geolocation.getCurrentPosition(p=>{
+        lat.value=p.coords.latitude.toFixed(6);lng.value=p.coords.longitude.toFixed(6);
+        msg.value='Koordinat terisi. Alamat ketik manual.';
+      },()=>{msg.value='Izin lokasi ditolak/tidak tersedia. Isi koordinat manual.'},{enableHighAccuracy:true,timeout:15000});
+    }
+
+    async function startCam(){
+      try{
+        stopCam();
+        stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:1920}},audio:false});
+        camOn.value=true;await Vue.nextTick();
+        vid.value.srcObject=stream;await vid.value.play();
+      }catch(e){camOn.value=false;msg.value='Kamera tidak bisa dibuka (butuh HTTPS & izin). Pakai tombol Galeri.'}
+    }
+    function stopCam(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}camOn.value=false}
+    function flip(){facing=facing==='environment'?'user':'environment';startCam()}
+    function shot(){
+      const v=vid.value;if(!v||!v.videoWidth)return;
+      const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;
+      c.getContext('2d').drawImage(v,0,0);
+      dt.value=toLocal(new Date());stopCam();setImg(c);msg.value='Foto diambil. Waktu & lokasi masih bisa diedit.';
+    }
+
+    const blob=()=>new Promise(r=>cv.value.toBlob(r,'image/jpeg',0.95));
+    const fname=()=>'foto-'+(dt.value||toLocal(new Date())).replace(/[:T]/g,'-')+'.jpg';
+    async function save(){
+      if(!img){msg.value='Belum ada foto.';return}
+      const b=await blob(),a=document.createElement('a');
+      a.href=URL.createObjectURL(b);a.download=fname();document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href),4000);msg.value='Foto disimpan.';
+    }
+    async function share(){
+      if(!img){msg.value='Belum ada foto.';return}
+      const f=new File([await blob()],fname(),{type:'image/jpeg'});
+      try{
+        if(navigator.canShare&&navigator.canShare({files:[f]}))await navigator.share({files:[f]});
+        else msg.value='Berbagi tidak didukung. Gunakan Simpan foto.';
+      }catch(e){}
+    }
+
+    // ===== Peta (Leaflet + OpenStreetMap/Nominatim) =====
+    const mapEl=ref(null),mapOpen=ref(false),q=ref(''),results=ref([]),mapMsg=ref(''),busy=ref(false);
+    const picked=reactive({lat:null,lng:null,addr:''});
+    let map=null,marker=null,rid=0;
+    const cleanAddr=s=>String(s||'').replace(/,\s*Indonesia$/i,'').replace(/\bJalan\b/g,'Jl.');
+    async function nget(path){
+      const r=await fetch('https://nominatim.openstreetmap.org'+path+'&accept-language=id&format=jsonv2');
+      if(!r.ok)throw new Error(r.status);
+      return r.json();
+    }
+    function setPoint(ll,reverse){
+      picked.lat=ll.lat;picked.lng=ll.lng;
+      if(!marker){
+        marker=L.marker(ll,{draggable:true,icon:L.divIcon({className:'pin',html:'📍',iconSize:[32,32],iconAnchor:[16,30]})}).addTo(map);
+        marker.on('dragend',()=>setPoint(marker.getLatLng(),true));
+      }else marker.setLatLng(ll);
+      if(reverse)reverseAddr();
+    }
+    async function reverseAddr(){
+      if(picked.lat==null){mapMsg.value='Tentukan titik di peta dulu.';return}
+      const id=++rid;mapMsg.value='Mencari alamat…';
+      try{
+        const d=await nget(`/reverse?lat=${picked.lat}&lon=${picked.lng}&zoom=18`);
+        if(id!==rid)return;
+        if(d&&d.display_name){picked.addr=cleanAddr(d.display_name);mapMsg.value='Alamat terisi dari peta; boleh diedit.'}
+        else mapMsg.value='Alamat tidak ditemukan. Isi nama lokasi manual.';
+      }catch(e){if(id===rid)mapMsg.value='Gagal mengambil alamat (cek internet). Isi manual.'}
+    }
+    async function openMap(){
+      mapOpen.value=true;await Vue.nextTick();
+      if(!map){
+        map=L.map(mapEl.value).setView([-2.5,118],5);
+        const base={
+          'Peta':L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key='+CARTO_KEY,{subdomains:'abcd',maxZoom:20,attribution:'&copy; OpenStreetMap contributors &copy; CARTO'}),
+          'Satelit':L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles &copy; Esri'}),
+          'Jalan (Esri)':L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles &copy; Esri'})
+        };
+        base['Peta'].addTo(map);
+        L.control.layers(base,null,{position:'topright'}).addTo(map);
+        map.on('click',e=>setPoint(e.latlng,true));
+      }
+      map.invalidateSize();
+      picked.addr=loc.value;mapMsg.value='';results.value=[];
+      const a=parseFloat(String(lat.value).replace(',','.')),b=parseFloat(String(lng.value).replace(',','.'));
+      if(!isNaN(a)&&!isNaN(b)){map.setView([a,b],17);setPoint({lat:a,lng:b},false)}
+    }
+    async function searchPlace(){
+      const t=q.value.trim();if(!t)return;
+      const m=t.match(/^(-?\d+(?:\.\d+)?)\s*[,;\s]\s*(-?\d+(?:\.\d+)?)$/);
+      if(m){const ll={lat:parseFloat(m[1]),lng:parseFloat(m[2])};map.setView(ll,17);setPoint(ll,true);results.value=[];return}
+      busy.value=true;mapMsg.value='Mencari…';
+      try{
+        const d=await nget(`/search?q=${encodeURIComponent(t)}&limit=6`);
+        results.value=d;
+        mapMsg.value=d.length?'Pilih salah satu hasil, atau klik peta.':'Tidak ada hasil. Coba kata kunci lain atau klik langsung di peta.';
+      }catch(e){mapMsg.value='Pencarian gagal (cek internet).'}
+      busy.value=false;
+    }
+    function pickResult(r){
+      const ll={lat:+r.lat,lng:+r.lon};
+      map.setView(ll,17);setPoint(ll,false);
+      picked.addr=cleanAddr(r.display_name);results.value=[];
+      mapMsg.value='Titik dipilih. Nama lokasi boleh diedit sebelum digunakan.';
+    }
+    function myLoc(){
+      if(!navigator.geolocation){mapMsg.value='GPS tidak didukung.';return}
+      mapMsg.value='Mengambil lokasi…';
+      navigator.geolocation.getCurrentPosition(p=>{
+        const ll={lat:p.coords.latitude,lng:p.coords.longitude};
+        map.setView(ll,17);setPoint(ll,true);
+      },()=>{mapMsg.value='Izin lokasi ditolak/tidak tersedia.'},{enableHighAccuracy:true,timeout:15000});
+    }
+    function applyPick(){
+      if(picked.lat==null){mapMsg.value='Tentukan titik di peta dulu.';return}
+      lat.value=picked.lat.toFixed(6);lng.value=picked.lng.toFixed(6);
+      if(picked.addr.trim())loc.value=picked.addr.trim();
+      mapOpen.value=false;msg.value='Lokasi diterapkan dari peta.';
+    }
+
+    onMounted(fontsReady);
+    onBeforeUnmount(stopCam);
+
+    return{cv,vid,dt,loc,lat,lng,note,sz,msg,hasImg,camOn,toLocal,onFile,gps,startCam,stopCam,flip,shot,save,share,mapEl,mapOpen,q,results,mapMsg,busy,picked,cleanAddr,openMap,searchPlace,pickResult,myLoc,applyPick,reverseAddr};
+  }
+}).mount('#app');
+</script>
+</body>
+</html>
