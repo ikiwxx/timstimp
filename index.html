@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<title>Stamp Foto – Waktu & Lokasi</title>
+<title>temstemp</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto+Condensed:wght@500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -98,12 +98,12 @@ input[type=file]{display:none}
     <button style="flex:0 0 auto" @click="dt = toLocal(new Date())">Sekarang</button>
   </div>
   <label>Alamat / nama lokasi</label>
-  <textarea v-model="loc" placeholder="Fakultas Teknik ULM Banjarbaru, Jl. Jenderal Achmad Yani KM.35,5, ..."></textarea>
+  <textarea v-model="loc" placeholder="isi alamat dl bos"></textarea>
   <div class="row">
     <div><label>Latitude</label><input v-model="lat" inputmode="decimal" placeholder="-3.445238"></div>
     <div><label>Longitude</label><input v-model="lng" inputmode="decimal" placeholder="114.840733"></div>
   </div>
-  <p class="sub" style="margin:4px 0 0">Minus = Selatan / Barat. Kosongkan untuk menyembunyikan kotak koordinat.</p>
+  <p class="sub" style="margin:4px 0 0">kosongkan untuk menyembunyikan kotak koordinat</p>
   <div class="btns" style="margin-top:8px">
     <button class="grn" @click="openMap">🗺️ Pilih di peta</button>
     <button @click="gps">📡 GPS saya</button>
@@ -112,7 +112,6 @@ input[type=file]{display:none}
   <input v-model="note" placeholder="mis. Pembukaan pelatihan">
   <label>Ukuran stamp {{ sz }}%</label>
   <input type="range" min="70" max="140" v-model.number="sz" style="padding:0">
-  <p class="sub" style="margin-top:12px">Alamat tidak terisi otomatis dari GPS; ketik manual.</p>
 </section>
 </main>
 
