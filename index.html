@@ -15,11 +15,11 @@
 :root{color-scheme:light;--tx:#1b1f3b;--mut:rgba(40,48,90,.62);--glass:rgba(255,255,255,.5);--glass2:rgba(255,255,255,.82);--bd:rgba(255,255,255,.85);--line:rgba(60,70,140,.16);--field:rgba(255,255,255,.72);--btn:rgba(255,255,255,.78);--ac:#2f80ff;--sh:0 10px 36px rgba(90,100,220,.22)}
 *{box-sizing:border-box}
 [v-cloak]{display:none}
-html{min-height:100%}
+html{min-height:100%;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{margin:0;min-height:100vh;color:var(--tx);font:400 15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
 background:radial-gradient(55% 45% at 10% 6%,#ff9ecb 0,transparent 62%),radial-gradient(50% 45% at 90% 10%,#b9a4ff 0,transparent 62%),radial-gradient(55% 50% at 85% 55%,#8fd8ff 0,transparent 62%),radial-gradient(55% 55% at 80% 95%,#8ef0d0 0,transparent 62%),radial-gradient(50% 50% at 8% 80%,#ffd98a 0,transparent 62%),#e3f1ff;background-attachment:fixed}
-main{max-width:1000px;margin:0 auto;padding:22px 14px 30px;display:grid;gap:20px}
-@media(min-width:820px){main{grid-template-columns:1fr 350px;align-items:start}}
+main{max-width:1000px;margin:0 auto;padding:22px max(14px,env(safe-area-inset-right)) 30px max(14px,env(safe-area-inset-left));display:grid;gap:20px}
+main>.card{min-width:0}
 .card,.sheet{background:var(--glass);-webkit-backdrop-filter:blur(26px) saturate(190%);backdrop-filter:blur(26px) saturate(190%);border:1px solid var(--bd);border-radius:20px;box-shadow:var(--sh),inset 0 1px 0 rgba(255,255,255,.9);padding:16px}
 .card::before,.sheet::before{content:'';display:block;width:12px;height:12px;border-radius:50%;background:#ff5f57;box-shadow:20px 0 0 #febc2e,40px 0 0 #28c840;margin:0 0 14px}
 h1{display:block;font-size:17px;font-weight:600;margin:0 0 4px;letter-spacing:-.01em}
@@ -41,13 +41,13 @@ button:disabled{opacity:.55;pointer-events:none}
 .pri:hover,.pk:hover{background:linear-gradient(135deg,#6cbdff,#3d8bff)}
 .btns{display:flex;gap:8px;flex-wrap:wrap}.btns>*{flex:1;white-space:nowrap}
 .stage{background:rgba(255,255,255,.4);border:1px solid var(--bd);border-radius:16px;box-shadow:inset 0 2px 10px rgba(90,100,220,.12);overflow:hidden;min-height:200px;display:flex;align-items:center;justify-content:center;margin-top:14px}
-canvas,video{max-width:100%;max-height:72vh;display:block}
+canvas,video{max-width:100%;max-height:72vh;max-height:72dvh;display:block}
 .empty{color:var(--mut);text-align:center;padding:40px 20px}
 .msg{font-size:13px;color:var(--mut);margin-top:10px;min-height:18px}
 input[type=file]{display:none}
-.modal{position:fixed;inset:0;background:rgba(255,255,255,.3);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);z-index:2000;display:flex;align-items:center;justify-content:center;padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom))}
-.sheet{background:var(--glass2);width:100%;max-width:720px;max-height:100%;overflow:auto;border-radius:22px;box-shadow:0 20px 60px rgba(90,100,220,.3),inset 0 1px 0 rgba(255,255,255,.9)}
-.mapbox{height:340px;margin-top:10px;border-radius:14px;overflow:hidden;border:1px solid var(--line);position:relative;z-index:0}
+.modal{position:fixed;inset:0;background:rgba(255,255,255,.3);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);z-index:2000;display:flex;align-items:center;justify-content:center;padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
+.sheet{background:var(--glass2);width:100%;max-width:720px;max-height:100%;overflow:auto;overscroll-behavior:contain;border-radius:22px;box-shadow:0 20px 60px rgba(90,100,220,.3),inset 0 1px 0 rgba(255,255,255,.9)}
+.mapbox{height:clamp(220px,42vh,420px);height:clamp(220px,42dvh,420px);margin-top:10px;border-radius:14px;overflow:hidden;border:1px solid var(--line);position:relative;z-index:0}
 .results{border:1px solid var(--line);border-radius:12px;margin-top:8px;max-height:150px;overflow:auto;background:var(--field)}
 .res{padding:8px 12px;border-bottom:1px solid var(--line);cursor:pointer;font-size:13px}
 .res:last-child{border-bottom:0}
@@ -57,6 +57,68 @@ input[type=file]{display:none}
 .leaflet-bar a{background:rgba(255,255,255,.92)!important;color:#1b1f3b!important}
 .leaflet-control-layers{border:0!important;border-radius:11px!important;box-shadow:0 2px 10px rgba(90,100,220,.3)!important;background:rgba(255,255,255,.92)!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font-family:inherit;color:#1b1f3b}
 .leaflet-control-attribution{background:rgba(255,255,255,.8)!important}
+
+/* ===== Responsive: HP & tablet, portrait & landscape ===== */
+input[type=datetime-local]{min-width:0;-webkit-appearance:none;appearance:none;min-height:40px}
+body{overflow-x:hidden}
+.res{overflow-wrap:anywhere}
+
+/* Layar sentuh: target sentuh nyaman & cegah auto-zoom iOS */
+@media(pointer:coarse){
+  input,textarea{font-size:16px}
+  button,.btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+  .res{padding:12px}
+}
+
+/* HP sempit (portrait) */
+@media(max-width:420px){
+  main{padding-top:14px;gap:14px}
+  .card,.sheet{padding:14px;border-radius:18px}
+  .btns>*{flex:1 1 130px}
+  .modal .row{flex-wrap:wrap}
+  .modal .row>input{flex:1 1 100%}
+}
+@media(max-width:340px){.row{flex-wrap:wrap}.row>*{flex:1 1 100%}}
+
+/* Tablet portrait / HP besar: 1 kolom, lebih lega */
+@media(min-width:600px) and (max-width:819px){
+  main{max-width:720px;padding-top:26px;gap:22px}
+  .card{padding:20px}
+  .mapbox{height:clamp(280px,48vh,520px);height:clamp(280px,48dvh,520px)}
+}
+
+/* Tablet landscape & desktop: 2 kolom (foto kiri, data kanan) */
+@media(min-width:820px),(orientation:landscape) and (min-width:640px){
+  main{grid-template-columns:minmax(0,1fr) minmax(300px,350px);align-items:start}
+}
+@media(min-width:1024px){
+  main{max-width:1180px;grid-template-columns:minmax(0,1fr) 380px}
+  main>.card:first-child{position:sticky;top:16px}
+}
+/* tablet landscape: pratinjau tidak melebihi tinggi layar */
+@media(orientation:landscape) and (min-width:820px) and (min-height:521px){
+  canvas,video{max-height:calc(100vh - 300px);max-height:calc(100dvh - 300px)}
+  .sheet{max-width:900px}
+  .mapbox{height:clamp(260px,52vh,520px);height:clamp(260px,52dvh,520px)}
+}
+
+/* HP landscape (layar pendek): tampilan app, tiap kolom scroll sendiri */
+@media(orientation:landscape) and (max-height:520px){
+  main{max-width:none;height:calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));padding-top:10px;padding-bottom:10px;gap:12px;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);align-items:stretch}
+  main>.card{position:static;min-height:0;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:12px;border-radius:16px}
+  .card::before,.sheet::before{margin-bottom:8px}
+  .stage{margin-top:10px;min-height:120px}
+  canvas,video{max-height:calc(100vh - 170px);max-height:calc(100dvh - 170px)}
+  .empty{padding:24px 14px}
+  label{margin:8px 0 4px}
+  /* modal peta: peta kiri, form kanan */
+  .modal{padding-top:max(6px,env(safe-area-inset-top));padding-bottom:max(6px,env(safe-area-inset-bottom))}
+  .sheet{max-width:none;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);column-gap:14px;align-content:start;padding:12px}
+  .sheet::before{grid-column:1/-1}
+  .sheet>*{grid-column:2;min-width:0}
+  .sheet>.mapbox{grid-column:1;grid-row:2/span 8;height:auto;min-height:max(200px,calc(100vh - 70px));min-height:max(200px,calc(100dvh - 70px));margin-top:0;align-self:stretch}
+  .results{max-height:90px}
+}
 </style>
 </head>
 <body>
@@ -389,8 +451,10 @@ createApp({
       mapOpen.value=false;msg.value='Lokasi diterapkan dari peta.';
     }
 
-    onMounted(fontsReady);
-    onBeforeUnmount(stopCam);
+    let rt;
+    const onResize=()=>{clearTimeout(rt);rt=setTimeout(()=>{if(map&&mapOpen.value){map.invalidateSize();if(marker)map.panTo(marker.getLatLng(),{animate:false})}},250)};
+    onMounted(()=>{fontsReady();window.addEventListener('resize',onResize);window.addEventListener('orientationchange',onResize)});
+    onBeforeUnmount(()=>{stopCam();clearTimeout(rt);window.removeEventListener('resize',onResize);window.removeEventListener('orientationchange',onResize)});
 
     return{cv,vid,dt,loc,lat,lng,note,sz,msg,hasImg,camOn,toLocal,onFile,gps,startCam,stopCam,flip,shot,save,share,mapEl,mapOpen,q,results,mapMsg,busy,picked,cleanAddr,openMap,searchPlace,pickResult,myLoc,applyPick,reverseAddr};
   }
