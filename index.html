@@ -271,8 +271,12 @@ createApp({
       if(hasC){
         const ct=`Koordinat: ${fmtC(la,'N','S')}, ${fmtC(lo,'E','W')}`;
         const tw=ctx.measureText(ct).width;
-        ctx.fillStyle='rgba(255,255,255,.22)';
-        rr(50*k,panelTop,tw+56*k,panelH,16*k);
+        const pw=tw+56*k;
+        const gr=ctx.createLinearGradient(50*k,0,50*k+pw,0);
+        gr.addColorStop(0,'rgba(255,255,255,.27)');
+        gr.addColorStop(1,'rgba(255,255,255,0)');
+        ctx.fillStyle=gr;
+        rr(50*k,panelTop,pw,panelH,16*k);
         ctx.fillStyle='#fff';ctx.textBaseline='middle';
         ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=6*k;ctx.shadowOffsetY=2*k;
         ctx.fillText(ct,78*k,panelTop+panelH/2+2*k);
